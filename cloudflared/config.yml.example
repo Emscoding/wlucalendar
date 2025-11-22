@@ -1,0 +1,14 @@
+# Example cloudflared config for a named tunnel
+# Copy this to ~/.cloudflared/config.yml after creating a named tunnel
+# Replace <TUNNEL_ID> and the hostname below with values produced by `cloudflared tunnel create`
+
+tunnel: <TUNNEL_ID>
+credentials-file: /Users/YOUR_USER/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: subdomain.yourdomain.com
+    service: http://localhost:3000
+  - service: http_status:404
+
+# Optional: tune protocol (h2mux if QUIC is blocked):
+# protocol: h2mux

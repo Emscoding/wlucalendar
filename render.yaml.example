@@ -1,0 +1,19 @@
+# Example render.yaml for Render's Infrastructure as Code
+# Rename to render.yaml and fill in service id values if you want Render to manage the service.
+
+services:
+  - type: web
+    name: a9-calendar
+    env: node
+    plan: free
+    repo: https://github.com/youruser/yourrepo
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: ASSEMBLY_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: YT_API_KEY
+        sync: false

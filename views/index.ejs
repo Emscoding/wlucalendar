@@ -1,0 +1,319 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Brightspace -> Google Calendar Export</title>
+  <!-- Artistic serif and cursive for intro title; hand-drawn font for accents -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <!-- Intro overlay: artistic museum-style logo assembly -->
+    <div id="introOverlay" class="intro-overlay" aria-hidden="false">
+      <div class="intro-box">
+        <div class="intro-logo-assembly" aria-hidden="true">
+          <!-- Six pieces that assemble into the logo -->
+          <svg viewBox="0 0 200 200" width="200" height="200" class="assembly-svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="ig" x1="0" x2="1">
+                <stop offset="0" stop-color="#0b76ff"/>
+                <stop offset="1" stop-color="#0066d6"/>
+              </linearGradient>
+            </defs>
+            <g>
+              <rect class="piece" x="10" y="10" width="80" height="80" rx="12" fill="url(#ig)"/>
+              <rect class="piece" x="110" y="10" width="80" height="80" rx="12" fill="url(#ig)"/>
+              <rect class="piece" x="10" y="110" width="80" height="80" rx="12" fill="#fff" opacity="0.05"/>
+              <rect class="piece" x="110" y="110" width="80" height="80" rx="12" fill="#fff" opacity="0.07"/>
+              <circle class="piece" cx="70" cy="70" r="18" fill="#fff" opacity="0.95"/>
+              <text class="piece" x="110" y="145" font-family="Playfair Display, serif" font-size="48" font-weight="700" fill="#072b66">BE</text>
+            </g>
+          </svg>
+        </div>
+  <h2 class="intro-title cursive">ICS Converter to Calendar</h2>
+  <p class="intro-sub">Import your .ics calendar or video to receive either calendar imported to your device, audio, or a transcription of the uploaded video.</p>
+      </div>
+    </div>
+    <div class="site-container">
+      <div id="splash" style="display:none"></div>
+      <header class="site-header fade-in">
+        <div class="brand">
+          <div class="logo">
+            <!-- Inline calendar icon to replace external logo -->
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+              <rect x="2" y="4" width="20" height="18" rx="2" fill="var(--primary)" />
+              <rect x="3.5" y="7" width="17" height="2" rx="1" fill="#ffffff" opacity="0.08" />
+              <rect x="7" y="11" width="2" height="2" rx="0.4" fill="#fff" />
+              <rect x="11" y="11" width="2" height="2" rx="0.4" fill="#fff" />
+              <rect x="15" y="11" width="2" height="2" rx="0.4" fill="#fff" />
+              <rect x="7" y="15" width="2" height="2" rx="0.4" fill="#fff" />
+              <rect x="11" y="15" width="2" height="2" rx="0.4" fill="#fff" />
+              <rect x="15" y="15" width="2" height="2" rx="0.4" fill="#fff" />
+            </svg>
+          </div>
+          <img src="/img/ornament.svg" class="logo-ornament" alt="ornament" />
+          <div>
+            <div class="title">Turn Brightspace calendars into downloadable Calendars</div>
+            <div class="muted" style="font-size:13px">Convert Brightspace calendar exports and study resources, studies and download audio</div>
+          </div>
+        </div>
+        <div class="nav-actions">
+          <button id="helpBtn" class="btn secondary">Help</button>
+          <button class="btn">Convert .ics</button>
+        </div>
+      </header>
+
+      <section class="hero fade-in" aria-hidden="false">
+        <div class="left">
+          <div class="kicker">Study smarter - import and organize</div>
+          <h1>Turn Brightspace calendars into clean Google-ready events</h1>
+          <img src="/img/hand-underline.svg" class="hand-underline" alt="underline" />
+          <p class="lead">Upload an exported .ics. Sources for time management support, plan ahead and download .ics calendar you can import into Desktop Calendar.</p>
+          <div class="hero-actions">
+            <button class="btn" onclick="document.getElementById('icsfile').focus()">Get started</button>
+            <button class="btn secondary" onclick="document.getElementById('ytQuery').focus()">Created by Rachid Emrick Bello</button>
+          </div>
+        </div>
+        <div class="right right-col">
+          <div class="panel">
+            <form method="post" action="/convert" enctype="multipart/form-data">
+              <label for="icsfile" class="muted">Upload exported .ics file</label>
+              <input type="file" id="icsfile" name="icsfile" accept=".ics" />
+              <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button type="submit" class="btn">Convert & Download</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <!-- decorative SVG shapes for artistic flair -->
+          <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#c79b3b" stop-opacity="0.08"/><stop offset="1" stop-color="#0b4f8a" stop-opacity="0.06"/></linearGradient>
+              <filter id="f1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter>
+            </defs>
+            <g filter="url(#f1)">
+              <circle cx="120" cy="80" r="80" fill="url(#g1)" />
+              <rect x="220" y="10" width="220" height="120" rx="24" fill="#eef6ff" opacity="0.6" transform="rotate(8 330 70)" />
+              <path d="M420 240c-40 20-120 20-160 0s-40-60 0-80 120-20 160 0 40 60 0 80z" fill="#f7efe6" opacity="0.5" />
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      
+        <!-- Help Modal -->
+        <div id="helpModal" class="help-modal" aria-hidden="true">
+          <div class="help-backdrop" id="helpBackdrop"></div>
+          <div class="help-panel panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <h3 style="margin:0">Instructions</h3>
+              <button id="helpClose" class="btn secondary">Close</button>
+            </div>
+            <p class="muted">Follow these steps to export and convert your Brightspace calendar:</p>
+            <ol>
+              <li>Calendar</li>
+              <li>Settings</li>
+              <li>Enable Calendar Feeds</li>
+              <li>Click subscribe</li>
+              <li>Download .ics of calendar</li>
+              <li>Upload an exported <code>.ics</code> file.</li>
+              <li>Click <strong>Convert & Download</strong> to get a calendar on desktop.</li>
+            </ol>
+            <p class="muted">There's the option of viewing videos from YouTube; if a video interests you you can download it and use the audio or transcription to efficiently review the video. Downloaded .txt transcriptions are available when provided.</p>
+          </div>
+        </div>
+
+  <div class="layout">
+    <main class="main-col">
+  <form method="post" action="/convert" enctype="multipart/form-data" style="margin-bottom:12px;padding:10px;border:1px solid #eee">
+  <label for="icsfile">Upload exported .ics file</label>
+  <input type="file" id="icsfile" name="icsfile" accept=".ics" />
+
+      <p style="margin-top:8px">
+        <button type="submit">Convert & Download .ics</button>
+      </p>
+      </form>
+
+      <!-- Color picker / scroll-wheel control -->
+      <section style="margin-top:10px;padding:10px;border:1px solid #eee;display:flex;gap:12px;align-items:center">
+      <label for="hue">Accent color (use mouse wheel over the slider to change)</label>
+      <input id="hue" type="range" min="0" max="360" value="162" style="flex:1" />
+      <input id="colorPicker" type="color" value="#5aa999" style="width:56px;height:36px;border-radius:6px;border:none;padding:0" />
+      </section>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <section style="margin-top:8px;padding:12px;border:1px solid #eee" class="search-row">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+  <input type="text" id="ytQuery" placeholder="Search Youtube" style="flex:2;min-width:320px" />
+  <button id="ytSearch">Search Youtube</button>
+        <label for="videoFile" style="margin-left:8px;display:flex;align-items:center;gap:8px">
+          <input id="videoFile" type="file" accept="video/*" style="display:inline-block" />
+          <button id="uploadVideoBtn" type="button">Upload & Play</button>
+        </label>
+      </div>
+
+      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" id="verbatimToggle" />
+          <span style="font-size:13px;color:var(--muted)">Word-for-word transcription (verbatim)</span>
+        </label>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" id="clientExtractToggle" <%= provider === 'google' ? 'checked' : '' %> />
+          <span style="font-size:13px;color:var(--muted)">Extract audio client-side</span>
+        </label>
+      </div>
+
+      <p style="margin-top:8px;color:#666">Tip: click a result to load it into the player. Use float to make a PIP view of video.</p>
+    </section>
+
+  <div id="ytResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px"></div>
+
+  <div id="playerContainer" style="margin-top:18px">
+      <div id="playerControls" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <button id="closePlayer">Close</button>
+        <button id="floatToggle">Float</button>
+        <div id="currentTitle" style="flex:1;color:#222;font-weight:600"></div>
+      </div>
+      <div id="playerWrap" style="border-radius:8px;overflow:hidden;box-shadow:0 12px 40px rgba(10,10,30,0.12);background:#000;display:flex;align-items:center;justify-content:center;min-height:120px">
+        <!-- player iframe or video element inserted here -->
+      </div>
+      <div id="transcriptArea" style="margin-top:12px"></div>
+      </div>
+    </main>
+
+    <aside class="side-col">
+      <div class="resources">
+  <h3>Videos on Time Management</h3>
+          <ul class="resource-list videos">
+            <li>
+              <a href="https://youtu.be/Q4sxT5A5rLc?si=ZiSYnfiWTR_p_V_Z" target="_blank" rel="noopener">Best Time Management Strategies: Boost Your Productivity (SchoolOfRealLife)</a>
+              <div class="muted">Covers Pomodoro, Eisenhower matrix, time blocking.</div>
+            </li>
+            <li>
+              <a href="https://youtu.be/iDbdXTMnOmE?si=PbRbtZhTvtCkAdka" target="_blank" rel="noopener">10 Tips for Effective Time Management (TopThink)</a>
+              <div class="muted">A quick, practical rundown of 10 proven strategies.</div>
+            </li>
+            <li>
+              <a href="https://youtu.be/iONDebHX9qk?si=rChQ8FusWOjussub" target="_blank" rel="noopener">How I Manage My Time: 10 Time Management Tips (Ali Abdaal)</a>
+              <div class="muted">Personal productivity habits: daily highlights, delegation, artificial deadlines.</div>
+            </li>
+            <li>
+              <a href="https://youtu.be/lriCkWIHEHs?si=BV29cCzdeL5-O_ik" target="_blank" rel="noopener">How I Manage My Time: 8 Tips that Changed My Life (Jeff Su)</a>
+              <div class="muted">Tips for balancing job, projects, and energy management.</div>
+            </li>
+          </ul>
+
+  <h3>Studies on Time Management</h3>
+        <ul class="resource-list studies">
+          <li>
+            <a href="https://journals.sagepub.com/doi/10.1177/2158244018824506" target="_blank" rel="noopener">Adams, R. V., & Blair, L. (2019): Impact of Time Management Behaviors on Undergraduate Performance</a>
+            <div class="muted">Time Management Behavior Scale linked to academic performance.</div>
+          </li>
+          <li>
+            <a href="https://www.researchgate.net/publication/376429951_Time_Management_Fluid_Intelligence_and_Academic_Achievement" target="_blank" rel="noopener">Romero, M., & Colleagues (2024): Time Management, Fluid Intelligence and Academic Achievement</a>
+            <div class="muted">Positive relationship between time management and grades.</div>
+          </li>
+          <li>
+            <a href="https://www.mdpi.com/2071-1050/16/16/6883" target="_blank" rel="noopener">Valente, S., Dominguez-Lara, S., & Lourenço, A. (2024): Planning Time Management in School Activities</a>
+            <div class="muted">Planning and procrastination in younger students.</div>
+          </li>
+          <li>
+            <a href="https://files.eric.ed.gov/fulltext/EJ1266710.pdf" target="_blank" rel="noopener">Ahmad, S., Batool, M., & Choudhry, A. (2019): Path Relationship of Time Management and Academic Achievement</a>
+            <div class="muted">Time utilization skills strongly linked to achievement (distance learners).</div>
+          </li>
+        </ul>
+
+        <div class="wlu-link">
+          <a href="https://students.wlu.ca/academics/support-and-advising/academic-advising/strategies-for-academic-success.html" target="_blank" rel="noopener">SAS Program</a>
+        </div>
+      </div>
+    </aside>
+
+      <footer class="site-footer" style="margin-top:24px;color:#666;font-size:14px;width:100">
+      </footer>
+  </div>
+
+    <script>
+  // YouTube API key is used server-side via the /youtube/search proxy. No client-side key is needed.
+
+      // Color picker wiring & splash hide
+      document.addEventListener('DOMContentLoaded', () => {
+        const splash = document.getElementById('splash');
+        // small delay for effect, then hide
+        setTimeout(() => { splash.classList.add('splash-hide'); setTimeout(()=>splash.remove(),800); }, 850);
+
+        const hue = document.getElementById('hue');
+        const picker = document.getElementById('colorPicker');
+        function updateAccent(h) {
+          const col = `hsl(${h} 60% 45%)`;
+          document.documentElement.style.setProperty('--accent', col);
+          // set color input
+          picker.value = hslToHex(h,60,45);
+        }
+        // set initial
+        updateAccent(parseInt(hue.value,10));
+
+        hue.addEventListener('input', e => updateAccent(e.target.value));
+        picker.addEventListener('input', e => {
+          // convert hex to hue
+          const hex = e.target.value;
+          const h = hexToHue(hex);
+          if (!isNaN(h)) hue.value = Math.round(h);
+          updateAccent(hue.value);
+        });
+
+        // allow mouse wheel over the slider to change hue quickly
+        hue.addEventListener('wheel', (ev) => {
+          ev.preventDefault();
+          const delta = Math.sign(ev.deltaY) * 5;
+          let v = parseInt(hue.value,10) - delta;
+          if (v < 0) v += 360;
+          if (v > 360) v -= 360;
+          hue.value = v;
+          updateAccent(v);
+        });
+      });
+
+      // helpers: convert HSL to hex (approx)
+      function hslToHex(h, s, l){
+        s /= 100; l /= 100;
+        const k = n => (n + h/30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => {
+          const x = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+          return Math.round(255 * x).toString(16).padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+      }
+
+      function hexToHue(hex){
+        // convert hex to hsl and return hue
+        const r = parseInt(hex.slice(1,3),16)/255;
+        const g = parseInt(hex.slice(3,5),16)/255;
+        const b = parseInt(hex.slice(5,7),16)/255;
+        const max = Math.max(r,g,b), min = Math.min(r,g,b);
+        let h=0, s=0, l=(max+min)/2;
+        if (max===min) h = s = 0; else {
+          const d = max-min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+          h = Math.round(h * 60);
+        }
+        return h;
+      }
+    </script>
+    <script src="/js/youtube-search.js"></script>
+  <script src="/js/ui-effects.js"></script>
+
+  </body>
+  </html>
