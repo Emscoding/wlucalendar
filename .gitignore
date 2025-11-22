@@ -1,3 +1,15 @@
 node_modules/
 .env
+public/uploads/
+public/vendor/ffmpeg/node_modules/
+dist/
+npm-debug.log
+.DS_Store
+.vscode/
+.env.local
+coverage/
+.cache/
+/.idea
+node_modules/
+.env
 /*.log

@@ -24,7 +24,8 @@
     "multer": "^1.4.5-lts.1",
     "node-ical": "^0.15.1",
     "node-schedule": "^2.1.1",
-    "nodemailer": "^6.9.3"
+    "nodemailer": "^6.9.3",
+    "serverless-http": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

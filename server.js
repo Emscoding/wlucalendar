@@ -897,6 +897,12 @@ app.post('/create', upload.single('backdropFile'), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+// Export the app for serverless adapters (Vercel) and only listen when
+// running the server directly (node server.js).
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
