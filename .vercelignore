@@ -1,0 +1,8 @@
+node_modules
+.git
+public/uploads
+public/backups
+*.mp4
+*.mov
+*.avi
+*.mkv
