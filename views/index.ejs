@@ -4,9 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Brightspace -> Google Calendar Export</title>
+  <!-- Artistic serif and cursive for intro title; hand-drawn font for accents -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
   </head>
-  <body>
+  <body data-invidious-base="<%= process.env.INVIDIOUS_BASE || 'https://inv.nadeko.net' %>">
     <!-- Intro overlay: artistic museum-style logo assembly -->
     <div id="introOverlay" class="intro-overlay" aria-hidden="false">
       <div class="intro-box">
@@ -29,8 +33,8 @@
             </g>
           </svg>
         </div>
-  <h2 class="intro-title cursive">ICS Calendar Converter</h2>
-  <p class="intro-sub">Import your .ics calendar file to convert it for your device.</p>
+  <h2 class="intro-title cursive">ICS Converter to Calendar</h2>
+  <p class="intro-sub">Import your .ics calendar or video to receive either calendar imported to your device, audio, or a transcription of the uploaded video.</p>
       </div>
     </div>
     <div class="site-container">
@@ -52,8 +56,8 @@
           </div>
           <img src="/img/ornament.svg" class="logo-ornament" alt="ornament" />
           <div>
-            <div class="title">Turn Brightspace calendars into downloadable files</div>
-            <div class="muted" style="font-size:13px">Convert Brightspace calendar exports for easy import</div>
+            <div class="title">Turn Brightspace calendars into downloadable Calendars</div>
+            <div class="muted" style="font-size:13px">Convert Brightspace calendar exports and study resources, studies and download audio</div>
           </div>
         </div>
         <div class="nav-actions">
@@ -67,10 +71,10 @@
           <div class="kicker">Study smarter - import and organize</div>
           <h1>Turn Brightspace calendars into clean Google-ready events</h1>
           <img src="/img/hand-underline.svg" class="hand-underline" alt="underline" />
-          <p class="lead">Upload an exported .ics file to convert it into a clean calendar format you can import into Google Calendar or any desktop calendar app.</p>
+          <p class="lead">Upload an exported .ics. Sources for time management support, plan ahead and download .ics calendar you can import into Desktop Calendar.</p>
           <div class="hero-actions">
             <button class="btn" onclick="document.getElementById('icsfile').focus()">Get started</button>
-            <button class="btn secondary">Created by Rachid Emrick Bello</button>
+            <button class="btn secondary" onclick="document.getElementById('ytQuery').focus()">Created by Rachid Emrick Bello</button>
           </div>
         </div>
         <div class="right right-col">
@@ -119,7 +123,7 @@
               <li>Upload an exported <code>.ics</code> file.</li>
               <li>Click <strong>Convert & Download</strong> to get a calendar on desktop.</li>
             </ol>
-            <!-- YouTube references removed: site now supports local upload & play only -->
+            <p class="muted">There's the option of viewing videos from YouTube; if a video interests you you can download it and use the audio or transcription to efficiently review the video. Downloaded .txt transcriptions are available when provided.</p>
           </div>
         </div>
 
@@ -140,28 +144,95 @@
       <input id="hue" type="range" min="0" max="360" value="162" style="flex:1" />
       <input id="colorPicker" type="color" value="#5aa999" style="width:56px;height:36px;border-radius:6px;border:none;padding:0" />
       </section>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <section style="margin-top:8px;padding:12px;border:1px solid #eee" class="search-row">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+  <input type="text" id="ytQuery" placeholder="Search Youtube" style="flex:2;min-width:320px" />
+  <button id="ytSearch">Search</button>
+  <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)">
+    <input type="checkbox" id="useInvidious" /> Use Invidious
+  </label>
+  <button id="ivPopular" class="btn secondary" type="button" title="Load popular feed from Invidious">Popular</button>
+        <% /* Hide local video upload & play UI */ %>
+        <!--
+        <label for="videoFile" style="margin-left:8px;display:flex;align-items:center;gap:8px">
+          <input id="videoFile" type="file" accept="video/*" style="display:inline-block" />
+          <button id="uploadVideoBtn" type="button">Upload & Play</button>
+        </label>
+        -->
+      </div>
+
+      <% /* Hide verbatim transcription toggle */ %>
+      <!--
+      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" id="verbatimToggle" />
+          <span style="font-size:13px;color:var(--muted)">Word-for-word transcription (verbatim)</span>
+        </label>
+      </div>
+      -->
+      <% /* Hide client-side extraction toggle to avoid loading ffmpeg assets */ %>
+      <!--
+      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" id="clientExtractToggle" <%= provider === 'google' ? 'checked' : '' %> />
+          <span style="font-size:13px;color:var(--muted)">Extract audio client-side</span>
+        </label>
+      </div>
+      -->
+
+  <% /* Hide upload/play tip */ %>
+  <!-- <p style="margin-top:8px;color:#666">Tip: click a result to load it into the player. Use float to make a PIP view of video.</p> -->
+    </section>
+
+  <div id="ytResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px"></div>
+
+  <div id="playerContainer" style="margin-top:18px;display:block">
+      <div id="playerControls" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <button id="closePlayer">Close</button>
+        <% /* Float remains hidden */ %>
+        <!-- <button id="floatToggle">Float</button> -->
+        <div id="currentTitle" style="flex:1;color:#222;font-weight:600"></div>
+      </div>
+      <div id="playerWrap" style="border-radius:8px;overflow:visible;box-shadow:0 12px 40px rgba(10,10,30,0.12);background:#000;width:100%;height:480px;display:block;position:relative">
+        <!-- player iframe or video element inserted here -->
+      </div>
+      <div id="transcriptArea" style="margin-top:12px"></div>
+      </div>
     </main>
 
-    <!-- Sidebar resources: kept only studies and support link; removed YouTube video list -->
     <aside class="side-col">
       <div class="resources">
-        <h3>Studies on Time Management</h3>
+  <h3>Videos on Time Management</h3>
+          <ul class="resource-list videos">
+            <li>
+              <a href="https://youtu.be/Q4sxT5A5rLc?si=ZiSYnfiWTR_p_V_Z" target="_blank" rel="noopener">Best Time Management Strategies: Boost Your Productivity (SchoolOfRealLife)</a>
+            </li>
+            <li>
+              <a href="https://youtu.be/iDbdXTMnOmE?si=PbRbtZhTvtCkAdka" target="_blank" rel="noopener">10 Tips for Effective Time Management (TopThink)</a>
+            </li>
+            <li>
+              <a href="https://youtu.be/iONDebHX9qk?si=rChQ8FusWOjussub" target="_blank" rel="noopener">How I Manage My Time: 10 Time Management Tips (Ali Abdaal)</a>
+            </li>
+            <li>
+              <a href="https://youtu.be/lriCkWIHEHs?si=BV29cCzdeL5-O_ik" target="_blank" rel="noopener">How I Manage My Time: 8 Tips that Changed My Life (Jeff Su)</a>
+            </li>
+          </ul>
+
+  <h3>Studies on Time Management</h3>
         <ul class="resource-list studies">
           <li>
             <a href="https://journals.sagepub.com/doi/10.1177/2158244018824506" target="_blank" rel="noopener">Adams, R. V., & Blair, L. (2019): Impact of Time Management Behaviors on Undergraduate Performance</a>
-            <div class="muted">Time Management Behavior Scale linked to academic performance.</div>
           </li>
           <li>
             <a href="https://www.researchgate.net/publication/376429951_Time_Management_Fluid_Intelligence_and_Academic_Achievement" target="_blank" rel="noopener">Romero, M., & Colleagues (2024): Time Management, Fluid Intelligence and Academic Achievement</a>
-            <div class="muted">Positive relationship between time management and grades.</div>
           </li>
           <li>
             <a href="https://www.mdpi.com/2071-1050/16/16/6883" target="_blank" rel="noopener">Valente, S., Dominguez-Lara, S., & Lourenço, A. (2024): Planning Time Management in School Activities</a>
-            <div class="muted">Planning and procrastination in younger students.</div>
           </li>
           <li>
             <a href="https://files.eric.ed.gov/fulltext/EJ1266710.pdf" target="_blank" rel="noopener">Ahmad, S., Batool, M., & Choudhry, A. (2019): Path Relationship of Time Management and Academic Achievement</a>
-            <div class="muted">Time utilization skills strongly linked to achievement (distance learners).</div>
           </li>
         </ul>
 
@@ -176,6 +247,8 @@
   </div>
 
     <script>
+  // YouTube API key is used server-side via the /youtube/search proxy. No client-side key is needed.
+
       // Color picker wiring & splash hide
       document.addEventListener('DOMContentLoaded', () => {
         const splash = document.getElementById('splash');
@@ -246,26 +319,8 @@
         return h;
       }
     </script>
+    <script src="/js/youtube-search.js"></script>
   <script src="/js/ui-effects.js"></script>
-    <script>
-      // Validate convert forms to avoid "No ICS URL or file provided" server message
-      (function(){
-        document.addEventListener('DOMContentLoaded', function(){
-          document.querySelectorAll('form[action="/convert"]').forEach(function(frm){
-            frm.addEventListener('submit', function(e){
-              const fileInput = frm.querySelector('input[name="icsfile"]');
-              const urlInput = frm.querySelector('input[name="icsurl"]');
-              const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
-              const hasUrl = urlInput && urlInput.value && urlInput.value.trim().length > 0;
-              if (!hasFile && !hasUrl) {
-                e.preventDefault();
-                alert('Please provide an ICS file or a URL before submitting.');
-              }
-            });
-          });
-        });
-      })();
-    </script>
 
   </body>
   </html>

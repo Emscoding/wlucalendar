@@ -7,6 +7,10 @@
   const keyEl = null; // no in-page api key input; server proxy used instead
   const resultsEl = document.getElementById('ytResults');
   const searchBtn = document.getElementById('ytSearch');
+  const useInvidious = document.getElementById('useInvidious');
+  const ivPopularBtn = document.getElementById('ivPopular');
+  const INVIDIOUS_BASE = (document.body && document.body.getAttribute('data-invidious-base')) || 'https://inv.nadeko.net';
+  function isInvidiousMode() { return !!(useInvidious && useInvidious.checked); }
   const playerWrap = document.getElementById('playerWrap');
   const transcriptArea = document.getElementById('transcriptArea');
   const closePlayer = document.getElementById('closePlayer');
@@ -101,11 +105,37 @@
 
   const card = document.createElement('div');
   card.className = 'result-card';
-
+  // Wrap thumbnail to add a play overlay
+  const thumbWrap = document.createElement('div');
+  thumbWrap.style.position = 'relative';
+  thumbWrap.style.display = 'block';
   const img = document.createElement('img');
   img.src = thumb;
   img.alt = title;
   img.style.cursor = 'pointer';
+  // Play overlay
+  const ov = document.createElement('div');
+  ov.style.position = 'absolute';
+  ov.style.left = '50%';
+  ov.style.top = '50%';
+  ov.style.transform = 'translate(-50%, -50%)';
+  ov.style.width = '54px';
+  ov.style.height = '54px';
+  ov.style.borderRadius = '50%';
+  ov.style.background = 'rgba(0,0,0,0.38)';
+  ov.style.color = '#fff';
+  ov.style.display = 'flex';
+  ov.style.alignItems = 'center';
+  ov.style.justifyContent = 'center';
+  ov.style.fontSize = '24px';
+  ov.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+  ov.style.pointerEvents = 'none';
+  ov.style.opacity = '0.85';
+  ov.textContent = '\u25B6'; // play triangle
+  thumbWrap.addEventListener('mouseenter', () => { ov.style.opacity = '0.95'; });
+  thumbWrap.addEventListener('mouseleave', () => { ov.style.opacity = '0.85'; });
+  thumbWrap.appendChild(img);
+  thumbWrap.appendChild(ov);
 
   const meta = document.createElement('div');
   meta.className = 'meta';
@@ -118,11 +148,11 @@
   ch.className = 'channel';
   ch.textContent = channel;
 
-  img.addEventListener('click', () => loadVideo(vidId, title));
+  thumbWrap.addEventListener('click', () => loadVideo(vidId, title));
 
   meta.appendChild(h);
   meta.appendChild(ch);
-  card.appendChild(img);
+  card.appendChild(thumbWrap);
   card.appendChild(meta);
   return card;
   }
@@ -156,9 +186,62 @@
     }
   }
 
+  async function searchInvidious(query) {
+    try {
+      const res = await fetch('/invidious/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: query })
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(res.status + ' ' + t);
+      }
+      const data = await res.json();
+      // Normalize Invidious format to our expected shape
+      const items = Array.isArray(data) ? data.map(item => ({
+        id: { videoId: item.videoId || item.videoId || item.videoId },
+        snippet: {
+          title: item.title || '',
+          channelTitle: item.author || item.authorName || '',
+          thumbnails: { medium: { url: (item.videoThumbnails && item.videoThumbnails.length ? (item.videoThumbnails[2] || item.videoThumbnails[item.videoThumbnails.length - 1]).url : '') } }
+        }
+      })) : [];
+      renderResults(items);
+    } catch (err) {
+      console.error('Invidious search error', err);
+      alert('Invidious search failed: ' + (err.message || err));
+    }
+  }
+
+  async function loadInvidiousPopular() {
+    try {
+      const res = await fetch('/invidious/popular');
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(res.status + ' ' + t);
+      }
+      const data = await res.json();
+      const items = Array.isArray(data) ? data.map(item => ({
+        id: { videoId: item.videoId || item.videoId || item.videoId },
+        snippet: {
+          title: item.title || '',
+          channelTitle: item.author || item.authorName || '',
+          thumbnails: { medium: { url: (item.videoThumbnails && item.videoThumbnails.length ? (item.videoThumbnails[2] || item.videoThumbnails[item.videoThumbnails.length - 1]).url : '') } }
+        }
+      })) : [];
+      renderResults(items);
+    } catch (err) {
+      console.error('Invidious popular error', err);
+      alert('Could not load popular feed: ' + (err.message || err));
+    }
+  }
+
   function loadVideo(idOrUrl, title) {
     currentTitle.textContent = title || '';
     playerWrap.innerHTML = '';
+    
+    console.log('Loading video:', idOrUrl, 'Invidious mode:', isInvidiousMode());
 
     // if this looks like a URL or an uploads path, play as a local video
     if (typeof idOrUrl === 'string' && (idOrUrl.startsWith('http://') || idOrUrl.startsWith('https://') || idOrUrl.startsWith('/'))) {
@@ -180,14 +263,38 @@
       return;
     }
 
-    // otherwise assume a YouTube id and embed
+    // otherwise assume a video ID and embed via YouTube or Invidious based on mode
     const iframe = document.createElement('iframe');
     iframe.width = '100%';
     iframe.height = '480';
-    iframe.src = `https://www.youtube.com/embed/${idOrUrl}?rel=0&modestbranding=1`;
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.style.width = '100%';
+    iframe.style.height = '480px';
+    iframe.style.display = 'block';
     iframe.style.border = 'none';
+    // Safari blocks autoplay with sound; prefer playsinline and disable autoplay for Safari
+    const ua = navigator.userAgent || '';
+    const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua) && !/Chromium\//.test(ua);
+    let src;
+    if (isInvidiousMode()) {
+      const base = (INVIDIOUS_BASE || 'https://inv.nadeko.net').replace(/\/$/, '');
+      const params = new URLSearchParams({ autoplay: isSafari ? '0' : '1', controls: '1' });
+      src = `${base}/embed/${idOrUrl}?${params.toString()}`;
+    } else {
+      const params = new URLSearchParams({
+        rel: '0', modestbranding: '1', playsinline: '1', autoplay: isSafari ? '0' : '1', origin: window.location.origin
+      });
+      // Use privacy-enhanced domain to reduce cross-origin/privacy issues on deployments
+      src = `https://www.youtube-nocookie.com/embed/${idOrUrl}?${params.toString()}`;
+    }
+    iframe.src = src;
+    console.log('Setting iframe src:', src);
+    // Help some browsers with referrer policy during cross-origin iframe loads
+    try { iframe.referrerPolicy = 'strict-origin-when-cross-origin'; } catch (e) {}
+    // Allow autoplay (for non-Safari), encrypted media, PiP, etc.
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
     playerWrap.appendChild(iframe);
+    console.log('Iframe appended to playerWrap. PlayerWrap dimensions:', playerWrap.offsetWidth, 'x', playerWrap.offsetHeight);
     // ensure player is visible
     playerWrap.scrollIntoView({ behavior: 'smooth' });
   }
@@ -224,8 +331,12 @@
     e.preventDefault();
     const q = qEl.value && qEl.value.trim();
     if (!q) return;
-    searchYouTube(q);
+    if (useInvidious && useInvidious.checked) searchInvidious(q); else searchYouTube(q);
   });
+
+  if (ivPopularBtn) {
+    ivPopularBtn.addEventListener('click', (e) => { e.preventDefault(); loadInvidiousPopular(); });
+  }
 
   // Upload & play a local video file
   if (uploadVideoBtn && videoFileInput) {
@@ -377,10 +488,40 @@
     });
   }
 
-  floatToggle.addEventListener('click', (e) => { e.preventDefault(); toggleFloat(); });
-  closePlayer.addEventListener('click', (e) => { e.preventDefault(); closeCurrent(); });
+  if (floatToggle) floatToggle.addEventListener('click', (e) => { e.preventDefault(); toggleFloat(); });
+  if (closePlayer) closePlayer.addEventListener('click', (e) => { e.preventDefault(); closeCurrent(); });
 
   // Allow Enter to trigger search
   qEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); } });
+
+  // Make sidebar "Videos on Time Management" links embed into the on-page player
+  function extractYouTubeId(u) {
+    try {
+      const url = new URL(u);
+      // youtu.be short links
+      if (url.hostname === 'youtu.be') {
+        return url.pathname.replace(/^\//, '').trim();
+      }
+      // youtube.com/watch?v=ID or /embed/ID
+      if (url.hostname.includes('youtube.com')) {
+        const v = url.searchParams.get('v');
+        if (v) return v;
+        const m = url.pathname.match(/\/embed\/([A-Za-z0-9_-]{6,})/);
+        if (m) return m[1];
+      }
+    } catch (e) { /* ignore parse errors */ }
+    return null;
+  }
+
+  document.querySelectorAll('.resource-list.videos a').forEach((a) => {
+    if (a._embedBound) return; a._embedBound = true;
+    a.addEventListener('click', (ev) => {
+      const id = extractYouTubeId(a.href);
+      if (!id) return; // let normal navigation happen if we can't parse
+      ev.preventDefault();
+      const title = a.textContent.trim();
+      loadVideo(id, title);
+    });
+  });
 
 })();
