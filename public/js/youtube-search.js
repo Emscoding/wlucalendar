@@ -265,8 +265,8 @@
 
     // otherwise assume a video ID and embed via YouTube or Invidious based on mode
     const iframe = document.createElement('iframe');
-    iframe.width = '100%';
-    iframe.height = '480';
+    iframe.setAttribute('width', '100%');
+    iframe.setAttribute('height', '480');
     iframe.style.position = 'absolute';
     iframe.style.top = '0';
     iframe.style.left = '0';
@@ -274,7 +274,10 @@
     iframe.style.height = '100%';
     iframe.style.display = 'block';
     iframe.style.border = 'none';
-    iframe.frameBorder = '0';
+    iframe.style.zIndex = '10';
+    iframe.style.visibility = 'visible';
+    iframe.style.opacity = '1';
+    iframe.setAttribute('frameBorder', '0');
     // Safari blocks autoplay with sound; prefer playsinline and disable autoplay for Safari
     const ua = navigator.userAgent || '';
     const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua) && !/Chromium\//.test(ua);
@@ -292,6 +295,7 @@
     }
     iframe.src = src;
     console.log('Setting iframe src:', src);
+    console.log('PlayerWrap computed style before append:', window.getComputedStyle(playerWrap).display, window.getComputedStyle(playerWrap).position);
     // Help some browsers with referrer policy during cross-origin iframe loads
     try { iframe.referrerPolicy = 'strict-origin-when-cross-origin'; } catch (e) {}
     // Allow autoplay (for non-Safari), encrypted media, PiP, etc.
@@ -300,6 +304,7 @@
     playerWrap.appendChild(iframe);
     console.log('Iframe appended to playerWrap. PlayerWrap dimensions:', playerWrap.offsetWidth, 'x', playerWrap.offsetHeight);
     console.log('Iframe dimensions:', iframe.offsetWidth, 'x', iframe.offsetHeight);
+    console.log('Iframe computed style:', window.getComputedStyle(iframe).display, window.getComputedStyle(iframe).visibility);
     // ensure player is visible
     playerWrap.scrollIntoView({ behavior: 'smooth' });
   }
