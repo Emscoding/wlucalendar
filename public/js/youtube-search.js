@@ -267,10 +267,14 @@
     const iframe = document.createElement('iframe');
     iframe.width = '100%';
     iframe.height = '480';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
     iframe.style.width = '100%';
-    iframe.style.height = '480px';
+    iframe.style.height = '100%';
     iframe.style.display = 'block';
     iframe.style.border = 'none';
+    iframe.frameBorder = '0';
     // Safari blocks autoplay with sound; prefer playsinline and disable autoplay for Safari
     const ua = navigator.userAgent || '';
     const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua) && !/Chromium\//.test(ua);
@@ -295,6 +299,7 @@
     iframe.allowFullscreen = true;
     playerWrap.appendChild(iframe);
     console.log('Iframe appended to playerWrap. PlayerWrap dimensions:', playerWrap.offsetWidth, 'x', playerWrap.offsetHeight);
+    console.log('Iframe dimensions:', iframe.offsetWidth, 'x', iframe.offsetHeight);
     // ensure player is visible
     playerWrap.scrollIntoView({ behavior: 'smooth' });
   }
