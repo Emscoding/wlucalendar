@@ -284,14 +284,22 @@
     let src;
     if (isInvidiousMode()) {
       const base = (INVIDIOUS_BASE || 'https://inv.nadeko.net').replace(/\/$/, '');
-      const params = new URLSearchParams({ autoplay: isSafari ? '0' : '1', controls: '1' });
+      // Invidious supports: autoplay, controls, loop, quality, listen (audio-only)
+      const params = new URLSearchParams({ 
+        autoplay: isSafari ? '0' : '1', 
+        controls: '1',
+        quality: 'dash',
+        local: 'true'
+      });
       src = `${base}/embed/${idOrUrl}?${params.toString()}`;
+      console.log('Using Invidious embed');
     } else {
       const params = new URLSearchParams({
         rel: '0', modestbranding: '1', playsinline: '1', autoplay: isSafari ? '0' : '1', origin: window.location.origin
       });
       // Use privacy-enhanced domain to reduce cross-origin/privacy issues on deployments
       src = `https://www.youtube-nocookie.com/embed/${idOrUrl}?${params.toString()}`;
+      console.log('Using YouTube-nocookie embed');
     }
     iframe.src = src;
     console.log('Setting iframe src:', src);
