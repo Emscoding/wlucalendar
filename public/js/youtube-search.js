@@ -351,12 +351,14 @@
     currentTitle.textContent = '';
   }
 
-  searchBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const q = qEl.value && qEl.value.trim();
-    if (!q) return;
-    if (useInvidious && useInvidious.checked) searchInvidious(q); else searchYouTube(q);
-  });
+  if (searchBtn) {
+    searchBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const q = qEl && qEl.value && qEl.value.trim();
+      if (!q) return;
+      if (useInvidious && useInvidious.checked) searchInvidious(q); else searchYouTube(q);
+    });
+  }
 
   if (ivPopularBtn) {
     ivPopularBtn.addEventListener('click', (e) => { e.preventDefault(); loadInvidiousPopular(); });
@@ -516,7 +518,9 @@
   if (closePlayer) closePlayer.addEventListener('click', (e) => { e.preventDefault(); closeCurrent(); });
 
   // Allow Enter to trigger search
-  qEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); } });
+  if (qEl && searchBtn) {
+    qEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); } });
+  }
 
   // Make sidebar "Videos on Time Management" links embed into the on-page player
   function extractYouTubeId(u) {
@@ -537,15 +541,18 @@
     return null;
   }
 
-  document.querySelectorAll('.resource-list.videos a').forEach((a) => {
-    if (a._embedBound) return; a._embedBound = true;
-    a.addEventListener('click', (ev) => {
-      const id = extractYouTubeId(a.href);
-      if (!id) return; // let normal navigation happen if we can't parse
-      ev.preventDefault();
-      const title = a.textContent.trim();
-      loadVideo(id, title);
+  // Only intercept sidebar clicks if an on-page player exists
+  if (playerWrap) {
+    document.querySelectorAll('.resource-list.videos a').forEach((a) => {
+      if (a._embedBound) return; a._embedBound = true;
+      a.addEventListener('click', (ev) => {
+        const id = extractYouTubeId(a.href);
+        if (!id) return; // let normal navigation happen if we can't parse
+        ev.preventDefault();
+        const title = a.textContent.trim();
+        loadVideo(id, title);
+      });
     });
-  });
+  }
 
 })();

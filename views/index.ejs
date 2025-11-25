@@ -34,7 +34,7 @@
           </svg>
         </div>
   <h2 class="intro-title cursive">ICS Converter to Calendar</h2>
-  <p class="intro-sub">Import your .ics calendar or video to receive either calendar imported to your device, audio, or a transcription of the uploaded video.</p>
+  <p class="intro-sub">Import your .ics calendar or video to receive either calendar imported to your device</p>
       </div>
     </div>
     <div class="site-container">
@@ -57,7 +57,7 @@
           <img src="/img/ornament.svg" class="logo-ornament" alt="ornament" />
           <div>
             <div class="title">Turn Brightspace calendars into downloadable Calendars</div>
-            <div class="muted" style="font-size:13px">Convert Brightspace calendar exports and study resources, studies and download audio</div>
+            <div class="muted" style="font-size:13px">Convert Brightspace calendar to one on your device. </div>
           </div>
         </div>
         <div class="nav-actions">
@@ -146,60 +146,34 @@
       </section>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <% /* Search and video UI commented out per request */ %>
+  <!--
   <section style="margin-top:8px;padding:12px;border:1px solid #eee" class="search-row">
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-  <input type="text" id="ytQuery" placeholder="Search Youtube" style="flex:2;min-width:320px" />
-  <button id="ytSearch">Search</button>
-  <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)">
-    <input type="checkbox" id="useInvidious" /> Use Invidious
-  </label>
-  <button id="ivPopular" class="btn secondary" type="button" title="Load popular feed from Invidious">Popular</button>
-        <% /* Hide local video upload & play UI */ %>
-        <!--
-        <label for="videoFile" style="margin-left:8px;display:flex;align-items:center;gap:8px">
-          <input id="videoFile" type="file" accept="video/*" style="display:inline-block" />
-          <button id="uploadVideoBtn" type="button">Upload & Play</button>
-        </label>
-        -->
-      </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="ytQuery" placeholder="Search Youtube" style="flex:2;min-width:320px" />
+      <button id="ytSearch">Search</button>
+      <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)">
+        <input type="checkbox" id="useInvidious" /> Use Invidious
+      </label>
+      <button id="ivPopular" class="btn secondary" type="button" title="Load popular feed from Invidious">Popular</button>
+    </div>
+  </section>
+  -->
 
-      <% /* Hide verbatim transcription toggle */ %>
-      <!--
-      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
-        <label style="display:flex;gap:8px;align-items:center">
-          <input type="checkbox" id="verbatimToggle" />
-          <span style="font-size:13px;color:var(--muted)">Word-for-word transcription (verbatim)</span>
-        </label>
-      </div>
-      -->
-      <% /* Hide client-side extraction toggle to avoid loading ffmpeg assets */ %>
-      <!--
-      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
-        <label style="display:flex;gap:8px;align-items:center">
-          <input type="checkbox" id="clientExtractToggle" <%= provider === 'google' ? 'checked' : '' %> />
-          <span style="font-size:13px;color:var(--muted)">Extract audio client-side</span>
-        </label>
-      </div>
-      -->
+  <!-- <div id="ytResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px"></div> -->
 
-  <% /* Hide upload/play tip */ %>
-  <!-- <p style="margin-top:8px;color:#666">Tip: click a result to load it into the player. Use float to make a PIP view of video.</p> -->
-    </section>
-
-  <div id="ytResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px"></div>
-
+  <!--
   <div id="playerContainer" style="margin-top:18px;display:block">
-      <div id="playerControls" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <button id="closePlayer">Close</button>
-        <% /* Float remains hidden */ %>
-        <!-- <button id="floatToggle">Float</button> -->
-        <div id="currentTitle" style="flex:1;color:#222;font-weight:600"></div>
-      </div>
-      <div id="playerWrap" style="border-radius:8px;overflow:hidden;box-shadow:0 12px 40px rgba(10,10,30,0.12);background:#000;width:100%;height:480px;display:block;position:relative;z-index:1">
-        <!-- player iframe or video element inserted here -->
-      </div>
-      <div id="transcriptArea" style="margin-top:12px"></div>
-      </div>
+    <div id="playerControls" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <button id="closePlayer">Close</button>
+      <div id="currentTitle" style="flex:1;color:#222;font-weight:600"></div>
+    </div>
+    <div id="playerWrap" style="border-radius:8px;overflow:hidden;box-shadow:0 12px 40px rgba(10,10,30,0.12);background:#000;width:100%;height:480px;display:block;position:relative;z-index:1">
+      <!-- player iframe or video element inserted here -->
+    </div>
+    <div id="transcriptArea" style="margin-top:12px"></div>
+  </div>
+  -->
     </main>
 
     <aside class="side-col">
