@@ -172,5 +172,10 @@ footer.site-footer{margin-top:28px;color:var(--muted);display:flex;justify-conte
 /* Ornament near brand */
 .logo-ornament{width:72px;height:24px;opacity:0.95}
 
+/* Force-hide YouTube search UI and player (safety in case template still includes them) */
+.search-row,
+#ytResults,
+#playerContainer { display: none !important; }
+
 
 
