@@ -3,6 +3,7 @@
 // - For quick demos the "Use sample key" button will populate a short-lived demo key if you want to try locally (it may not work long-term).
 
 (function () {
+  console.log('YouTube search script loaded');
   const qEl = document.getElementById('ytQuery');
   const keyEl = null; // no in-page api key input; server proxy used instead
   const resultsEl = document.getElementById('ytResults');
@@ -22,6 +23,8 @@
   const clientExtractToggle = document.getElementById('clientExtractToggle');
   let ffmpegReady = false;
   let ffmpegInstance = null;
+
+  console.log('Elements found:', { qEl, resultsEl, searchBtn, useInvidious, playerWrap, closePlayer });
 
   // Lazy-load ffmpeg.wasm when user first opts in
   async function ensureFFmpeg() {
@@ -148,7 +151,10 @@
   ch.className = 'channel';
   ch.textContent = channel;
 
-  thumbWrap.addEventListener('click', () => loadVideo(vidId, title));
+  thumbWrap.addEventListener('click', () => {
+    console.log('Thumbnail clicked, videoId:', vidId, 'title:', title);
+    loadVideo(vidId, title);
+  });
 
   meta.appendChild(h);
   meta.appendChild(ch);
