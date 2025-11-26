@@ -123,7 +123,6 @@
               <li>Upload an exported <code>.ics</code> file.</li>
               <li>Click <strong>Convert & Download</strong> to get a calendar on desktop.</li>
             </ol>
-            <p class="muted">There's the option of viewing videos from YouTube; if a video interests you you can download it and use the audio or transcription to efficiently review the video. Downloaded .txt transcriptions are available when provided.</p>
           </div>
         </div>
 
@@ -147,34 +146,28 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Math section with audio/video upload and transcription options -->
+  <!-- Audio/video upload and transcription options -->
   <section style="margin-top:8px;padding:12px;border:1px solid #eee">
-    <h4 style="margin:0 0 8px 0">math</h4>
-    <form method="post" action="/transcribe" enctype="multipart/form-data" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
-      <div style="display:flex;gap:8px;align-items:center;flex:1">
-        <button type="button" class="btn secondary" onclick="alert('Search YouTube feature')">Search Youtube</button>
-        <button type="button" class="btn secondary" onclick="document.getElementById('mediafile').click()">Browse...</button>
-        <span style="font-size:13px;color:#666">No file selected.</span>
+    <form method="post" action="/transcribe" enctype="multipart/form-data" id="transcribeForm">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <input type="file" id="mediafile" name="mediafile" accept="audio/*,video/*" style="flex:1;min-width:200px" />
         <button type="submit" class="btn">Upload & Play</button>
       </div>
+      <div style="margin-top:8px">
+        <label style="display:flex;gap:6px;align-items:center;font-size:14px">
+          <input type="checkbox" id="verbatim" name="verbatim" />
+          Word-for-word transcription (verbatim)
+        </label>
+        <label style="display:flex;gap:6px;align-items:center;font-size:14px;margin-top:4px">
+          <input type="checkbox" id="clientSide" name="clientSide" />
+          Extract audio client-side
+        </label>
+      </div>
+      <p style="margin-top:8px;font-size:13px;color:#666">
+        Tip: click a result to load it into the player. Use float to make a PIP view of video.
+      </p>
     </form>
-    <input type="file" id="mediafile" name="mediafile" accept="audio/*,video/*" style="display:none" />
-    <div style="margin-top:8px">
-      <label style="display:flex;gap:6px;align-items:center;font-size:14px">
-        <input type="checkbox" id="verbatim" name="verbatim" />
-        Word-for-word transcription (verbatim)
-      </label>
-      <label style="display:flex;gap:6px;align-items:center;font-size:14px;margin-top:4px">
-        <input type="checkbox" id="clientSide" name="clientSide" />
-        Extract audio client-side
-      </label>
-    </div>
-    <p style="margin-top:8px;font-size:13px;color:#666">
-      Tip: click a result to load it into the player. Use float to make a PIP view of video.
-    </p>
   </section>
-
-  <div id="ytResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:12px"></div>
 
   <div id="playerContainer" style="margin-top:18px;display:none">
     <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -304,9 +297,62 @@
         }
         return h;
       }
+
+      // Handle transcription form submission
+      const transcribeForm = document.getElementById('transcribeForm');
+      const playerContainer = document.getElementById('playerContainer');
+      const playerWrap = document.getElementById('playerWrap');
+      const closePlayerBtn = document.getElementById('closePlayer');
+
+      if (transcribeForm) {
+        transcribeForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData(transcribeForm);
+          const mediafile = formData.get('mediafile');
+          
+          if (!mediafile || mediafile.size === 0) {
+            alert('Please select a file');
+            return;
+          }
+
+          try {
+            const response = await fetch('/transcribe', {
+              method: 'POST',
+              body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.url) {
+              // Show player container
+              playerContainer.style.display = 'block';
+              
+              // Create video element
+              playerWrap.innerHTML = `<video controls style="width:100%;height:100%;background:#000" src="${result.url}"></video>`;
+              
+              // Scroll to player
+              playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+              alert(result.message || result.error || 'Upload failed');
+            }
+          } catch (err) {
+            console.error('Upload error:', err);
+            alert('Upload failed: ' + err.message);
+          }
+        });
+      }
+
+      if (closePlayerBtn) {
+        closePlayerBtn.addEventListener('click', () => {
+          playerContainer.style.display = 'none';
+          playerWrap.innerHTML = '';
+        });
+      }
     </script>
     <script src="/js/youtube-search.js"></script>
   <script src="/js/ui-effects.js"></script>
 
   </body>
   </html>
+
